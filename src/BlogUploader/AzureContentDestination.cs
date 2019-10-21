@@ -17,7 +17,7 @@ namespace BlogUploader
 
         public AzureContentDestination(AzureConfiguration config, ILogger<AzureContentDestination> logger)
         {
-            _whatIfMode = config.WhatIfMode;
+            _whatIfMode = false;
             _logger = logger;
 
             CloudStorageAccount account = CloudStorageAccount.Parse(config.ConnectionString);

@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -12,23 +13,18 @@ namespace BlogUploader
             _basePath = config.BasePath;
         }
 
-        public FileInfo[] GetFiles()
+        public IReadOnlyCollection<ISourceFileInfo> GetFiles()
         {
             return Directory.GetFiles(_basePath, "*", SearchOption.AllDirectories)
-                .Select(x => new FileInfo(x))
+                .Select(x => new DiskSourceFileInfo(new FileInfo(x), _basePath))
                 .ToArray();
         }
 
-        public string ToFullPath(string relativePath)
+        public bool HasFile(string relativePath)
         {
-            return Path.Combine(_basePath, relativePath);
-        }
+            var fullPath = Path.Combine(_basePath, relativePath);
 
-        public string ToRelativePath(string fullPath)
-        {
-            var relativePath = Path.GetRelativePath(_basePath, fullPath);
-
-            return relativePath.Replace('\\', '/');
+            return File.Exists(fullPath);
         }
     }
 }

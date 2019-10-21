@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Security.Cryptography;
 using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
@@ -27,7 +26,7 @@ namespace BlogUploader
 
             foreach (var file in sourceFiles)
             {
-                string destinationPath = _source.ToRelativePath(file.FullName);
+                var destinationPath = file.RelativePath.Replace('\\', '/');
                 var fileOnDestination = _destination.GetFile(destinationPath);
 
                 if (fileOnDestination is null)
@@ -39,7 +38,7 @@ namespace BlogUploader
 
                     processedFiles.Add(destinationPath);
                 }
-                else if (fileOnDestination.ContentMD5 != MD5Hash(file.FullName))
+                else if (fileOnDestination.ContentMD5 != MD5Hash(file))
                 {
                     // File on destination is different
                     await _destination.DeleteFileAsync(destinationPath);
@@ -58,7 +57,7 @@ namespace BlogUploader
             var destinationFiles = _destination.GetFiles();
             foreach (var file in destinationFiles)
             {
-                if (!File.Exists(_source.ToFullPath(file.Path)))
+                if (!_source.HasFile(file.Path))
                 {
                     await _destination.DeleteFileAsync(file.Path);
                 }
@@ -67,12 +66,12 @@ namespace BlogUploader
             return processedFiles;
         }
 
-        private string MD5Hash(string fullPath)
+        private string MD5Hash(ISourceFileInfo file)
         {
             using var md5 = MD5.Create();
-            using var file = File.Open(fullPath, FileMode.Open);
+            using var stream = file.OpenRead();
 
-            return Convert.ToBase64String(md5.ComputeHash(file));
+            return Convert.ToBase64String(md5.ComputeHash(stream));
         }
     }
 }

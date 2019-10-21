@@ -6,12 +6,9 @@ namespace BlogUploader
     {
         public string ConnectionString { get; }
 
-        public bool WhatIfMode { get; }
-
         public AzureConfiguration(IConfiguration configuration)
         {
             ConnectionString = configuration.GetValue<string>("AZURE_CONNECTIONSTRING");
-            WhatIfMode = false;
         }
     }
 }

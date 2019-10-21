@@ -1,13 +1,11 @@
-using System.IO;
+using System.Collections.Generic;
 
 namespace BlogUploader
 {
     public interface IContentSource
     {
-        FileInfo[] GetFiles();
+        IReadOnlyCollection<ISourceFileInfo> GetFiles();
 
-        string ToRelativePath(string fullPath);
-
-        string ToFullPath(string relativePath);
+        bool HasFile(string relativePath);
     }
 }
